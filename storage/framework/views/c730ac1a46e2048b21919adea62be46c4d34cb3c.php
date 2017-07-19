@@ -1,6 +1,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://unpkg.com/vue"></script>
-{{cookie('laravel_session')}}
+<?php echo e(cookie('laravel_session')); ?>
+
 
 
 
@@ -108,7 +109,7 @@
         Notification.requestPermission();
 
         //Private Chat
-        let pusher_private = new Pusher('{{env('PUSHER_APP_KEY')}}', {
+        let pusher_private = new Pusher('<?php echo e(env('PUSHER_APP_KEY')); ?>', {
             authEndpoint: 'broadcasting/auth',
             auth: {
                 headers: {
@@ -179,7 +180,7 @@
             //Check form chat exist!
 
             if(NameChannelGroup===null){
-            if( message!='{{auth::user()->name}}'){
+            if( message!='<?php echo e(auth::user()->name); ?>'){
 
 
                 $.post('message', {
@@ -234,7 +235,7 @@
 
                                         }
 
-                                        if (data.user.name != '{{auth::user()->name}}') {
+                                        if (data.user.name != '<?php echo e(auth::user()->name); ?>') {
 
                                             $('#list-message-' + Name_ChannelSend_Private).append(' <li class="alert alert-info small"> ' + data.message + ' </li>').scrollTop(9999);
                                         }
@@ -253,7 +254,7 @@
         let pusher=null;
         function CreatePresence(){
             Pusher.logToConsole = true;
-            pusher = new Pusher('{{env('PUSHER_APP_KEY')}}', {
+            pusher = new Pusher('<?php echo e(env('PUSHER_APP_KEY')); ?>', {
                 authEndpoint: 'broadcasting/auth',
                 auth: {
                     headers: {
@@ -302,7 +303,7 @@
                 Member_Info();
 
 
-                if ('{{auth::user()->name}}' == data.user2) {
+                if ('<?php echo e(auth::user()->name); ?>' == data.user2) {
 
                     var NameChannel = data.NameChannel;
                     //  this.Channel_Private = NameChannel;
@@ -326,7 +327,7 @@
                             PrivateChannel.bind("Minh\\PusherChat\\Event\\SentMessage", function (data) {
 
 
-                                if (data.user.name != '{{auth::user()->name}}') {
+                                if (data.user.name != '<?php echo e(auth::user()->name); ?>') {
                                     if ($('#message-content-' + Name_ChannelSend_Private).attr('class') == null) {
                                         new Notification('Tin nhắn mới từ ' + data.user.name,
                                             {
@@ -365,8 +366,8 @@
             channel.members.each(function (member) {
                 var userInfo = member.info;
 
-                infor +="  <li style=\"margin-bottom: 5px;\" ><button class=\"btn btn-success\" id=\"chat\" style=\"width: 140px\"   onclick=\"sendEventPresence('"+userInfo.name+"','"+userInfo.name+"-{{auth::user()->name}}','{{auth::user()->name}}-"+userInfo.name+"');\"  ><i class='glyphicon glyphicon-user'></i> " + userInfo.name + " </button></li>" ;
-                //infor += "<button class=\"btn btn-success\" id=\"chat\"   onclick=\"sendEventPresence('"+userInfo.name+"','"+userInfo.name+"-{{auth::user()->name}}','{{auth::user()->name}}-"+userInfo.name+"');\"  >" + userInfo.name + " </button>";
+                infor +="  <li style=\"margin-bottom: 5px;\" ><button class=\"btn btn-success\" id=\"chat\" style=\"width: 140px\"   onclick=\"sendEventPresence('"+userInfo.name+"','"+userInfo.name+"-<?php echo e(auth::user()->name); ?>','<?php echo e(auth::user()->name); ?>-"+userInfo.name+"');\"  ><i class='glyphicon glyphicon-user'></i> " + userInfo.name + " </button></li>" ;
+                //infor += "<button class=\"btn btn-success\" id=\"chat\"   onclick=\"sendEventPresence('"+userInfo.name+"','"+userInfo.name+"-<?php echo e(auth::user()->name); ?>','<?php echo e(auth::user()->name); ?>-"+userInfo.name+"');\"  >" + userInfo.name + " </button>";
             });
             // alert(infor);
             document.getElementById('list-member').innerHTML = infor;
