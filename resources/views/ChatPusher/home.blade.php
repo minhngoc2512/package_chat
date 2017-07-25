@@ -9,6 +9,7 @@
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
+
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -28,13 +29,11 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
+
         </div>
 
     </div>
 </div>
-
-
-
 <div
             style="z-index: 900 ;position: fixed;
     bottom: 5px;
@@ -150,6 +149,8 @@
 
             });
         }
+
+
         function sendmessage_private(user_to,NameChannel) {
 
             var message = $('#text-message-'+NameChannel).val();
@@ -190,6 +191,7 @@
                 }, function (data, status) {
                     console.log("Data: " + data + "\nStatus: " + status);
                     Name_ChannelSend_Private = data;
+
                     var statusForm = 0;
                     for(i=0;i<ListFormStatus.length;i++){
                             if(ListFormStatus[i]===Name_ChannelSend_Private){
@@ -309,6 +311,15 @@
                     var CheckChannel = data.CheckChannel;
 
                     //Check form chat exist! CheckChannel
+                    {{--@if(Session::has('channelChat'))--}}
+                            {{--@foreach(Session::get('channelChat') as $data)--}}
+                            {{--@if($data)--}}
+                            {{--@endif--}}
+                            {{----}}
+                            {{----}}
+                            {{--@endforrach--}}
+                            {{----}}
+                        {{--@endif--}}
 
 
 
@@ -324,18 +335,7 @@
                             ListChannel[ListChannel.length] = NameChannel;
                             var PrivateChannel = pusher_private.subscribe('private-chat.' + NameChannel);
                             PrivateChannel.bind("Minh\\PusherChat\\Event\\SentMessage", function (data) {
-
-
                                 if (data.user.name != '{{auth::user()->name}}') {
-                                    if ($('#message-content-' + Name_ChannelSend_Private).attr('class') == null) {
-                                        new Notification('Tin nhắn mới từ ' + data.user.name,
-                                            {
-                                                body: data.message, // Nội dung thông báo
-                                                icon: 'http://www.freeiconspng.com/uploads/message-icon-png-14.png'// Hình ảnh
-                                            }
-                                        );
-                                    }
-
                                     if ($('#message-content-' + NameChannel).attr('class') == null && $('#message-content-' + CheckChannel).attr('class') == null) {
                                         $.get('FormReceive/' + data.user.name + '/' + NameChannel, function (data) {
                                             var data2 = data.split("+++");
@@ -348,6 +348,7 @@
                             });
                         }
                     }
+
 
                 }
             });
@@ -410,9 +411,49 @@
 
 
         }
+        function getFormRefresh(user,Channel){
+            var PrivateChannel = pusher_private.subscribe('private-chat.' + Channel);
+            PrivateChannel.bind("Minh\\PusherChat\\Event\\SentMessage", function (data) {
+                if ($('#message-content-' + Channel).attr('class') == null) {
+                    $.get('FormSend/' + user + '/' + Channel, function (data) {
+
+
+                        var data2 = data.split("+++");
+
+                        $('#chat-message').append(data2[0]);
+                        $('#list-message-' + Channel).append(data2[1]).scrollTop(9999);
+                    });
+
+                }
+                if (data.user.name != '{{auth::user()->name}}') {
+
+                    $('#list-message-' + Channel).append(' <li class="alert alert-info small"> ' + data.message + ' </li>').scrollTop(9999);
+                }
+
+            });
+            ListChannel[ListChannel.length] = Channel;
+        }
+
+        function checkFormRefresh(){
+            @if(Session::has('channelChat'))
+                    @php(
+                    $channelRefresh = Session::get('channelChat')
+                    )
+                 @foreach($channelRefresh as $key=> $data)
+                    console.log({{$key}}+','+'{{$data['user']}}');
+                    getFormRefresh('{{$data['user']}}','{{$data['channel']}}');
+                @endforeach
+            @endif
+
+
+        }
+
         $('#option').hide();
 
+
+
         CreatePresence();
+        checkFormRefresh();
         getNoticationPresence();
         StatusConnect();
         _Notication();
